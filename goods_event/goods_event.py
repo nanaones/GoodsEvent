@@ -4,7 +4,6 @@ TAG = 'GoodsEvent'
 
 class GoodsEvent(IconScoreBase):
 
-#
     _EVENT_STATE    = 'event_state'
     _JOIN_MESSAGE   = 'join_message'
     _CANDIDATE_LIST = 'candidate_list'
@@ -13,16 +12,17 @@ class GoodsEvent(IconScoreBase):
     def __init__(self, db: IconScoreDatabase) -> None:
         super().__init__(db)
 
-        # True:Event OPEN / False:Event CLOSE
+        # Stores evet status. True:Event OPEN, False:Event CLOSE
         self._VDB_event_state = VarDB(self._EVENT_STATE, db, value_type=bool)
 
-        # {ADDRESS:Answer Optional Message(exam. 1 ~ 7)}
+        # Stores {sender_address : message} key/value pairs. 
+        # Message must be an integer between 1 ~ 7.
         self._DDB_join_message = DictDB(self._JOIN_MESSAGE, db, value_type=int)
 
-        # [ADDRESS_1, ADDRESS_2, ...] -> Not to be duplicate address
+        # Stores paticipants list. Same address should not be stored in duplicate.  
         self._ADB_candidate_list = ArrayDB(self._CANDIDATE_LIST, db, value_type=str)
 
-        # Event winner Address [ADDRESS_1, ADDRESS_2, ...]
+        # Stores the list of winners. No duplicate addresses are permitted.
         self._ADB_event_winner = ArrayDB(self._EVENT_WINNER, db, value_type=str)
         
     def on_install(self) -> None:
@@ -49,42 +49,57 @@ class GoodsEvent(IconScoreBase):
     @external
     def join_event(self, _join_message:int):
 
-        # is Event started ?
-        if not self.________________.get(): revert('Event Closed.')
+        # Implement This  
+        # Check prerequisite. Event status must be True.
+        #
+        #if not ( ) : revert('Event Closed.')
 
-        #join_message is the number of dice.
-        if _join_message _____ _join_message ___ :
-            revert('Check your Message Value...')
+        # Implement This  
+        # _join_message must be a number between 1 to 7.
+        #
+        #if ( ) or ( ) :
+        #    revert('Check your Message Value...')
 
-        #set property
-        #msg has two kind of property
-        _sender_address = str(self.msg.______)
-
-        if self._DDB_join_message[_sender_address] == 0:
-            self._ADB_candidate_list.put(_sender_address)
-
-        self._DDB_join_message[_sender_address] = _join_message
+        # Implement This 
+        # 1. Get messager sender address, and store it as a string. 
+        # 2. If the address is not in the _DDB_join_message, 
+        #    add the adress in the _ADB_candidate_list. 
+        # 3. Add/Update the sender's message in the _DDB_join_message, 
+        #
+        #_sender_address = str( )
+        #  
+        #if self._DDB_join_message[ ] == 0:
+        #    self._ADB_candidate_list.put( )
+        #
+        #self._DDB_join_message[ ] = ( )
         pass
         
     @external
     def raffle(self):
-        # Make sure the message sender is owner.
-        self.___________()
+        # Implement This
+        # Make sure the message sender is the contract owner.
+        #
+        #self.( ) 
 
-        # is Event started ?
-        if self.________________(): revert('Please close the event first.')
+        # Implement This 
+        # Event status must be closed. 
+        # 
+        #if ( ): revert('Please close the event first.')
 
-        # Make sure there are no participants.
-        # first, count participants.
-        # second, if participants count number were 0( you can use len(Array DB)), close the event. with revert.
-         ___________ = len(self.___________________)
-         if ___________ == 0: revert('Candidate list is empty.')
+        # Get the number of participants.
+        # Revert if the participants number is zero.
+        _join_count = len(self._ABD_candidate_list)
 
-        #Divide Hash to get the random value.
+        if _join_count == 0: revert('Candidate list is empty.')
+
+        # Use tx hash to generate a pseudo-random number to pick an address among candidates.  
         _get_random = int.from_bytes(self.tx.hash, byteorder='big', signed=False) % _join_count
 
-        # Pop(index) is not supported.
+        # Add the selected address to the _ADB_event_winner. 
         self._ADB_event_winner.put(self._ADB_candidate_list[_get_random])
+        
+        # Remove the address from the candidate list. 
+        # Note that pop(index) is not supported in ArrayDB.
         if _get_random == 0:
             self._ADB_candidate_list = list(self._ADB_candidate_list)[1:_join_count]
 
@@ -95,8 +110,9 @@ class GoodsEvent(IconScoreBase):
             self._ADB_candidate_list = list(self._ADB_candidate_list)[0:_get_random]\
                                      + list(self._ADB_candidate_list)[_get_random + 1 : _join_count]
 
-    # Responds to the current number of people.
-    # Since the winner is subtracted from Array, the number of participants and the number of winners must be added.
+    # Returns the total number of participants.
+    # Since the winner is subtracted from the initial candidate list, 
+    # the number of candidatess and the number of winners are added.
     @external(readonly=True)
     def count_join_user(self) -> str:
         return str(len(self._ADB_candidate_list) + len(self._ADB_event_winner))
@@ -110,8 +126,10 @@ class GoodsEvent(IconScoreBase):
         
     @external(readonly=True)
     def check_join_message(self, _join_address:str = None) -> str:
-        # Find joiner's address
-        if not _join_address: _join_address = str(self.msg.______)
+        # Implement This 
+        # _join_address is an optional value. If empty, use message sender address.
+        #
+        #if not _join_address: _join_address = str( )
         
         # return joiner's message
         _get_msg = self._DDB_join_message[_join_address]
