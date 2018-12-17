@@ -1,14 +1,11 @@
-# Overview
- > Developed smart contract to be used for event dispatching event from Icon Communication team.
-***
 # Requirement Description
-1. The operator can specify event start or stop.
-2. Participants can not participate in the event at the end of the event.
-3. The operator can change the event stop setting to the start again.
-4. Participants participate in the event by submitting the selected number of views for the question.
-5. You can participate in the event in duplicate, but you can not be a duplicate when you win.
-6. The answer will be updated to the latest when participating in duplicate.
-7. Event winners are extracted and accumulated one by one at a time.
+1. The operator can start or stop the event.
+2. Participants can not participate in the event after the event stopped.
+3. The operator can change the event status from stop to start.
+4. Participants participate in the event by submitting a message, message should be a number within certain range.
+5. Paticipants can submit a message multiple times, and the message is updated with the latest submission. Multiple submittion does not increase the chance of win.
+6. A winner is selected each time the designated function is called, and the result should be appended to the list. There must be a way to list up the winner list. 
+
 ***
 # Development Environment
 - OS : ubuntu 18.04 (Docker = Ubuntu 18.04.1 LTS)
